@@ -66,3 +66,54 @@ def handle_spam(state: EmailState):
     print("The email has been moved to the spam folder.")
 
     return {}
+
+def draft_response(state: EmailState):
+    """Alfred drafts a preliminary response for legitimate emails"""
+    email = state["email"]
+    category = state["email_category"] or "general"
+    
+    # Prepare our prompt for the LLM
+    prompt = f"""
+    As Alfred the butler, draft a polite preliminary response to this email.
+    
+    Email:
+    From: {email['sender']}
+    Subject: {email['subject']}
+    Body: {email['body']}
+    
+    This email has been categorized as: {category}
+    
+    Draft a brief, professional response that Mr. nullHawk can review and personalize before sending.
+    """
+    
+    # Call the LLM
+    messages = [HumanMessage(content=prompt)]
+    response = model.invoke(messages)
+    
+    # Update messages for tracking
+    new_messages = state.get("messages", []) + [
+        {"role": "user", "content": prompt},
+        {"role": "assistant", "content": response.content}
+    ]
+    
+    # Return state updates
+    return {
+        "email_draft": response.content,
+        "messages": new_messages
+    }
+
+def notify_mr_nullHawk(state: EmailState):
+    """Alfred notifies Mr. nullHawk about the email and presents the draft response"""
+    email = state["email"]
+    
+    print("\n" + "="*50)
+    print(f"Sir, you've received an email from {email['sender']}.")
+    print(f"Subject: {email['subject']}")
+    print(f"Category: {state['email_category']}")
+    print("\nI've prepared a draft response for your review:")
+    print("-"*50)
+    print(state["email_draft"])
+    print("="*50 + "\n")
+    
+    # We're done processing this email
+    return {}
