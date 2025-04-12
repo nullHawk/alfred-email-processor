@@ -12,6 +12,10 @@ The Alfred Email Processor is an intelligent email management system designed to
 ## Workflow
 
 Below is the workflow of the email processing system:
+![image](https://github.com/user-attachments/assets/94b744b0-b17e-4548-a1c5-9241a799acc9)
+![image](https://github.com/user-attachments/assets/69b89e80-3105-4f9a-b98c-196b92b43efe)
+
+
 
 
 
