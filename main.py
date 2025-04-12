@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from typing import TypedDict, List, Dict, Any, Optional
 from langgraph.graph import StateGraph, START, END
 from langchain_openai import ChatOpenAI
@@ -52,7 +53,7 @@ compiled_graph = email_graph.compile()
 legitimate_email = {
     "sender": "john.smith@example.com",
     "subject": "Question about your services",
-    "body": "Dear Mr. Hugg, I was referred to you by a colleague and I'm interested in learning more about your consulting services. Could we schedule a call next week? Best regards, John Smith"
+    "body": "Dear Mr. nullHawk, I was referred to you by a colleague and I'm interested in learning more about your consulting services. Could we schedule a call next week? Best regards, John Smith"
 }
 
 # Example spam email
@@ -83,3 +84,21 @@ spam_result = compiled_graph.invoke({
     "email_draft": None,
     "messages": []
 })
+
+load_dotenv
+os.environ["LANGFUSE_PUBLIC_KEY"]
+os.environ["LANGFUSE_SECRET_KEY"]
+os.environ["LANGFUSE_HOST"]
+
+from langfuse.callback import CallbackHandler
+
+# Initialize Langfuse CallbackHandler for LangGraph/Langchain (tracing)
+langfuse_handler = CallbackHandler()
+
+# Process legitimate email
+legitimate_result = compiled_graph.invoke(
+    input={"email": legitimate_email, "is_spam": None, "spam_reason": None, "email_category": None, "draft_response": None, "messages": []},
+    config={"callbacks": [langfuse_handler]}
+)
+
+compiled_graph.get_graph().draw_mermaid_png()
